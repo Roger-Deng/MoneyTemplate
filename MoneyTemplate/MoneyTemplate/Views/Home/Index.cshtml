@@ -1,5 +1,4 @@
-﻿@using PagedList;
-@model IPagedList<MoneyTemplate.Models.ViewModels.ChargeViewModel>
+﻿@model IPagedList<MoneyTemplate.Models.ViewModels.ChargeViewModel>
 @{
     ViewBag.Title = "Home Page";
 }
@@ -14,8 +13,8 @@
                 <div class="col-sm-10">
                     <select id="category" class="form-control">
                         <option value="" selected>請選擇</option>
-                        <option>支出</option>
-                        <option>收入</option>
+                        <option>Expense</option>
+                        <option>Income</option>
                     </select>
                 </div>
             </div>
@@ -66,5 +65,5 @@
                 </tr>
             }
         </table>
-        @Html.PagedListPager(Model,page => Url.Action("Controller", "Action", new { page }))
+        @Html.PagedListPager(Model,page => Url.Action("Index", new { page }))
  </div>
