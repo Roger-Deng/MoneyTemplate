@@ -1,0 +1,11 @@
+﻿@model decimal?
+
+    @if (Model == null)
+    {
+        <span class="text-danger">No Data</span>
+    }
+    else
+    {
+        <span>@(((decimal)Model).ToString("N0")) </span>
+    }
+

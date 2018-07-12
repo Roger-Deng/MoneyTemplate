@@ -10,13 +10,13 @@ namespace MoneyTemplate.Models.ViewModels
     {
         public int Id { get; set; }
 
-        public Type Category { get; set; }
+        public string Category { get; set; }
   
         public string Name { get; set; }
     
         public DateTime Date { get; set; }
    
-        public int Money { get; set; }
+        public decimal Money { get; set; }
 
         public string Description { get; set; }
     }

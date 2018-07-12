@@ -58,6 +58,10 @@
     </div>
     <div class="container body-content">
         @RenderBody()
+        @{
+            Html.RenderPartial("_StatementPartialView");
+
+        }
         <hr />
         <footer>
             <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>

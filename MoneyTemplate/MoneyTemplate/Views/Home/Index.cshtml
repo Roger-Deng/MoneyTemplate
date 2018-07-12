@@ -13,8 +13,8 @@
                 <div class="col-sm-10">
                     <select id="category" class="form-control">
                         <option value="" selected>請選擇</option>
-                        <option>Expense</option>
-                        <option>Income</option>
+                        <option>支出</option>
+                        <option>收入</option>
                     </select>
                 </div>
             </div>
@@ -44,26 +44,3 @@
             </div>
         </form>
     </div>
-
-  <div class="row">
-
-        <table class="table table-bordered table-hover" id="money-list">
-            <tr>
-                <th width="5%">#</th>
-                <th width="30%">類別</th>
-                <th >日期</th>
-                <th width="30%">金額</th>
-            </tr>
-
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>@Html.DisplayFor(modelItem => item.Id)</td>
-                    <td>@Html.DisplayFor(modelItem => item.Category)</td>
-                    <td>@Html.DisplayFor(modelItem => item.Date)</td>
-                    <td>@Html.DisplayFor(modelItem => item.Money)</td>
-                </tr>
-            }
-        </table>
-        @Html.PagedListPager(Model,page => Url.Action("Index", new { page }))
- </div>

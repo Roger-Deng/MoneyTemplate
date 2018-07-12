@@ -4,13 +4,13 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using PagedList;
-using MoneyTemplate.Models.FakeData;
+using MoneyTemplate.Service.FakeData;
 
 namespace MoneyTemplate.Controllers
 {
     public class HomeController : Controller
     {
-        private FakeDataSource fakeData = new FakeDataSource();
+        private static FakeDataSource fakeData = new FakeDataSource();
 
         public ActionResult Index(int page  = 1)
         {

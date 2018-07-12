@@ -1,0 +1,10 @@
+﻿@model DateTime? 
+
+    @if (Model == null)  {
+        <span class="text-danger">No DateTime</span>
+    }
+    else {
+        <span>  @(((DateTime)Model).ToString("yyyy-MM-dd"))   </span>   
+            
+    }
+
