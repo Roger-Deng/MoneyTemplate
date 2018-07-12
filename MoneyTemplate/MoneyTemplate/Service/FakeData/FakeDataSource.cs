@@ -31,7 +31,7 @@ namespace MoneyTemplate.Service.FakeData
             _data = new List<ChargeViewModel>(); 
 
             for (int i = 1; i <= 50; i++) {
-             _data.Add(new ChargeViewModel { Id = i, Category = type[rand.Next(3)], Name = "", Date = System.DateTime.Now, Money = (decimal)rand.Next(15000) });
+               _data.Add(new ChargeViewModel { Id = i, Category = type[rand.Next(3)], Name = "", Date = System.DateTime.Now, Money = (decimal)rand.Next(15000) });
             }
         }
 
