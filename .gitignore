@@ -2,4 +2,7 @@
 # 這個 .gitignore 檔案由 Microsoft(R) Visual Studio 自動建立。
 ################################################################################
 
-/MoneyTemplate/.vs/MoneyTemplate/v15/Server/sqlite3/db.lock
+/MoneyTemplate/.vs
+/.vs/
+/bin/
+/MoneyTemplate/MoneyTemplate/obj
