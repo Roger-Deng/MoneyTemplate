@@ -1,0 +1,1194 @@
+
+@model ApprovalManageVM
+
+@{
+    ViewBag.Title = "代發扣項目彙總列表";
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+    var i = 1;
+}
+
+
+@section styles
+{
+    <style>
+
+        .card-2 {
+            box-shadow: 0 3px 6px rgba(0,0,0,0.08), 0 3px 6px rgba(0,0,0,0.16);
+        }
+
+
+        .nav-pills > li > a,
+        .nav-pills > li > a:hover,
+        .nav-pills > li > a:focus {
+            color: rgba(0,0,0,1)
+        }
+
+        .nav-pills > li.active > a,
+        .nav-pills > li.active > a:hover,
+        .nav-pills > li.active > a:focus {
+            color: #fff;
+            background-color: #07A398 !important;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+        }
+
+
+
+        mtr {
+            border: .5px solid #dddddd;
+        }
+
+        /*第一欄第一列：左上*/
+        tr:first-child th:first-child {
+            border-top-left-radius: 10px;
+        }
+        /*第一欄最後列：右上*/
+        tr:first-child th:last-child {
+            border-top-right-radius: 10px;
+        }
+
+        /*第一欄最後列：左下*/
+        tr:last-child td:first-child {
+            border-bottom-left-radius: 10px;
+        }
+        /*最後欄第一列：右下*/
+        tr:last-child td:last-child {
+            border-bottom-right-radius: 10px;
+        }
+
+
+        .tooltip {
+            font-size: 18px;           
+        }
+
+
+        .tooltip-inner {
+            max-width:500px;
+            width: 400px;            
+        }
+
+
+        .table-scroll {
+            width:100%; 
+            display: block;
+            /* Decoration */
+            /*border-spacing: 0;
+            border: 1px solid;*/
+        }
+
+            .table-scroll thead {
+                /*background-color: #f1f1f1;*/
+                position: relative;
+                display: block;
+                width: 100%;
+                /*overflow-y: scroll;*/
+                box-shadow: 0 3px 5px rgba(0,0,0,0.16), 0 3px 5px rgba(0,0,0,0.23);
+            }
+
+            .table-scroll tbody {
+                /* Position */
+                display: block;
+                position: relative;
+                width: 100%;
+                height:450px;
+                overflow-y: scroll;
+                /* Decoration */
+                /*border-top: 1px solid rgba(0,0,0,0.2);*/
+            }
+
+            .table-scroll tr {
+                width: 100%;
+                display: flex;
+            }
+
+            .table-scroll td, .table-scroll th {
+                flex-basis: 100%;
+                flex-grow: 2;
+                display: block;
+                /*padding: 1rem;*/
+                /*text-align: left;*/
+            }
+
+            .table-scroll tfoot {
+                /*background-color: #f1f1f1;*/
+                position: relative;
+                display: block;
+                width: 100%;
+                /*overflow-y: scroll;*/
+                box-shadow: 0 -3px 5px rgba(0,0,0,0.23), 0 -3px 5px rgba(0,0,0,0.16);
+            }
+
+    </style>
+}
+
+
+    <div class="wrapper" style="">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="page-title-box">
+                        <div class="btn-group float-right">
+                            <ol class="breadcrumb hide-phone p-0 m-0">
+                                <li class="breadcrumb-item">
+                                    <a href="@Url.Action("Index", "Home", new { area = "" })">首頁</a>
+                                </li>
+                                <li class="breadcrumb-item">
+                                    <a href="#">簽核專區</a>
+                                </li>
+                                <li class="breadcrumb-item active">@ViewBag.Title</li>
+                            </ol>
+                        </div>
+                        <h4 class="page-title">@ViewBag.Title</h4>
+                    </div>
+                </div>
+                <!-- end col -->
+            </div><!-- end page title end breadcrumb -->
+
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card m-b-30 ">
+                        <div class="bg-holder bg-card"></div>
+                        <div class="card-body bg-light card-body-bg-green" >
+                            <div class="border-dashed" style="margin-top:1%; margin-bottom:1%;">
+                                <!-- Nav tabs -->
+                                <ul class="nav nav-pills nav-justified" role="tablist" style="font-size:21px;" id="approveTab">
+                                    <li class="nav-item waves-effect waves-light" style="border-color:aliceblue; border-style:none; height:65px;" id="nav-item-1">
+                                        <a class="nav-link" data-toggle="tab" href="#SummaryStatement" role="tab" aria-selected="true">代發扣項目彙總表</a>
+                                    </li>
+                                    <li class="nav-item waves-effect waves-light" style="border-color:aliceblue; border-style:none;">
+                                        <a class="nav-link" data-toggle="tab" href="#ApprovalList" role="tab" aria-selected="false">待簽核清單</a>
+                                    </li>
+                                    <li class="nav-item waves-effect waves-light" style="border-color:aliceblue; border-style:none;">
+                                        <a class="nav-link" data-toggle="tab" href="#TraceApprove" role="tab" aria-selected="false">已簽核清單</a>
+                                    </li>
+                                    <li class="nav-item waves-effect waves-light" style="border-color:aliceblue; border-style:none;">
+                                        <a class="nav-link " data-toggle="tab" href="#Memo" role="tab" aria-selected="false">其他</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- end col -->
+            </div>
+            <!-- end row -->
+
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card m-b-30">
+                        <div class="card-body">
+                            <!-- Tab panes -->
+                            <div class="tab-content">
+
+                                <!-- Summary Statements -->
+                                <div class="tab-pane p-3 active" id="SummaryStatement" role="tabpanel" style="font-size:20px; margin:1%;">
+                                    <div class="row mt-1 mb-1">
+                                        <div class="col-xs-12 col-sm-6 col-md-6">
+                                            <div class="dt-buttons btn-group d-flex justify-content-md-start">
+                                                <div class="p-2">
+                                                    <label style="font-size:20px;">
+                                                        作業名稱:  @ViewBag.ProjectName (@ViewBag.YM)<br />
+                                                        作業時間: @ViewBag.ProjectSDate ~ @ViewBag.ProjectEDate
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-12 col-sm-6 col-md-6 ">
+                                            <div class="dt-buttons btn-group d-flex justify-content-end">
+                                                <div class="p-2"> </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @*<label style="margin-left:1%; margin-bottom:1%;">作業名稱:  @ViewBag.ProjectName (@ViewBag.YM)<br />作業時間: @ViewBag.ProjectSDate ~ @ViewBag.ProjectEDate</label>*@
+                                    @*<div style="overflow-y: auto; height:500px;"></div>*@
+                                    <table class="table table-borderless table-dashboard table-scroll">
+                                        <thead style="background-color:#d7d7d4;">
+                                            <tr >
+                                                <th class="text-left"   style="width:15%;font-size:21px; text-align:center;">@Html.DisplayNameFor(model => model.SummaryVM.Item)</th>
+                                                <th class="text-center" style="width:7%; font-size:21px; text-align:center;">@Html.DisplayNameFor(model => model.SummaryVM.type)</th>
+                                                <th class="text-center" style="width:10%;font-size:21px; text-align:center;">@Html.DisplayNameFor(model => model.SummaryVM.EAmount)</th>
+                                                <th class="text-center" style="width:10%;font-size:21px; text-align:center;">@Html.DisplayNameFor(model => model.SummaryVM.DAmount)</th>
+                                                <th class="text-center" style="width:15%;font-size:21px; text-align:center;">@Html.DisplayNameFor(model => model.SummaryVM.Memo)</th>
+                                                @*<th class="text-center" style="width:10%;">@Html.DisplayNameFor(model => model.SummaryVM.Ref)</th>*@
+                                                <th class="text-center" style="width:8%; font-size:22px; font-weight:bolder; color:aliceblue; background-color:cadetblue">@Html.DisplayNameFor(model => model.SummaryVM.Summary)</th>
+                                            </tr>
+                                        </thead>
+                                        @* <thead style="background-color:#d7d7d4; font-size:medium;"> <tr style="font-size:larger;"> <th>項目</th> <th>類型</th> <th>金額</th> <th>備註說明</th> <th>其他</th> </tr> </thead>  *@
+                                        <tbody>
+                                            @if (Model.SummaryLstVM.Count > 0)
+                                            {
+                                                foreach (var item in Model.SummaryLstVM.Where(x => x.Item != "合計"))
+                                                {
+                                                    <tr>
+                                                        <td class="" style="font-size:18px">
+                                                            @Html.DisplayFor(modelItem => item.Item)
+                                                        </td>
+                                                        <td class="text-center" style="font-size:18px">
+                                                            @if (item.type == "PLUS")
+                                                            {
+                                                                <div class=''>加項(<span class='fa fa-plus '></span>)</div>
+                                                            }
+                                                            else
+                                                            {
+                                                                <div class=''>減項(<span class='fa fa-minus '></span>)</div>
+                                                            }
+
+                                                        </td>
+                                                        <td class="text-center" style="font-size:18px">
+                                                            @if (item.type == "PLUS")
+                                                            {
+                                                                @item.EAmount.ToString("N0")
+                                                            }
+
+                                                        </td>
+                                                        <td class="text-center" style="font-size:18px">
+                                                            @if (item.type == "MINUS")
+                                                            {
+                                                                @item.DAmount.ToString("N0")
+                                                            }
+                                                        </td>
+                                                        <td class="text-center">
+                                                            @*<button type="button" class="btn btn-primary waves-effect mo-mb-2 waves-light" data-toggle="popover" data-trigger="hovor" title="" data-content="@item.Memo.ToString()" data-original-title="說明">Dismissible popover</button>*@
+                                                            @if (i++ <= 5)
+                                                            {
+                                                                <div style="font-size:18px; text-decoration: underline;" data-toggle="tooltip" data-placement="bottom" title="@item.Memo">
+                                                                    @Html.DisplayFor(modelItem => item.Memo).ToString().Substring(0, item.Memo.ToString().Length > 10 ? 10 : item.Memo.ToString().Length)...
+                                                                </div>
+                                                            }
+                                                            else
+                                                            {
+                                                                <div style="font-size:18px; text-decoration: underline;" data-toggle="tooltip" data-placement="top" title="@item.Memo">
+                                                                    @Html.DisplayFor(modelItem => item.Memo).ToString().Substring(0, item.Memo.ToString().Length > 10 ? 10 : item.Memo.ToString().Length)...
+                                                                </div>
+                                                            }
+
+
+
+                                                        </td>
+                                                        <td class="text-center" style="font-size:18px"></td>
+                                                    </tr>
+
+                                                }
+                                            }
+                                            @if (Model.SummaryLstVM.Count < 5)
+                                            {
+                                                <tr><td colspan="6" style="font-size:20px;color:#fff">.</td></tr>
+                                                <tr><td colspan="6" style="font-size:20px;color:#fff">.</td></tr>
+                                                <tr><td colspan="6" style="font-size:20px;color:#fff">.</td></tr>
+                                                <tr><td colspan="6" style="font-size:20px;color:#fff">.</td></tr>
+                                                <tr><td colspan="6" style="font-size:20px;color:#fff">.</td></tr>
+                                                <tr><td colspan="6" style="font-size:20px;color:#fff">.</td></tr>
+                                                <tr><td colspan="6" style="font-size:20px;color:#fff">.</td></tr>
+                                                <tr><td colspan="6" style="font-size:20px;color:#fff">.</td></tr>
+                                            }
+
+                                        </tbody>
+                                        <tfoot style="background-color:#d7d7d4; font-size:larger; font-weight:bolder; color:red;">
+                                            @if (Model.SummaryLstVM.Where(x => x.Item == "合計").Count() > 0)
+                                            {
+                                                <tr>
+                                                    <td style="font-size:21px">合計</td>
+                                                    <td class="text-center" style="font-size:21px"></td>
+                                                    <td class="text-center" style="font-size:21px">                                               
+                                                        @Model.SummaryLstVM.Where(x => x.Item == "合計").FirstOrDefault().EAmount.ToString("N0")
+                                                    </td>
+                                                    <td class="text-center" style="font-size:21px">
+                                                        @Model.SummaryLstVM.Where(x => x.Item == "合計").FirstOrDefault().DAmount.ToString("N0")
+                                                    </td>
+                                                    <td class="text-center" style="font-size:21px;"></td>
+                                                    @*<td class="text-center"style="font-size:21px;"></td>*@
+                                                    <td class="text-center" style="font-size:21px; color:aliceblue; background-color:cadetblue">
+                                                        @Model.SummaryLstVM.Where(x => x.Item == "合計").FirstOrDefault().Summary.ToString("N0")
+                                                    </td>
+                                                </tr>                                              
+                                            }
+                                            @*<tr>
+                                                <td style="font-size:21px">合計</td>
+                                                <td class="text-center" style="font-size:21px"></td>
+                                                <td class="text-center" style="font-size:21px">123,143</td>
+                                                <td class="text-center" style="font-size:21px">223,866</td>
+                                                <td class="text-center" style="font-size:21px;"></td>
+                                                @*<td class="text-center"style="font-size:21px;"></td>
+                                                <td class="text-center" style="font-size:21px; color:aliceblue; background-color:cadetblue">347,009</td>
+                                            </tr>*@
+                                        </tfoot>
+                                    </table>
+
+                                </div>
+
+                                <!-- Approval List -->
+                                <div class="tab-pane p-3" id="ApprovalList" role="tabpanel">
+                                    <div class="row mt-4 ml-4">
+                                        <div class="col-xs-12 col-sm-6 col-md-6">
+                                            <div class="dt-buttons btn-group d-flex justify-content-md-start">
+                                                <div class="p-2">
+                                                    <p class="font-14 mb-0">
+                                                        <label style="font-size:20px;"> 待簽核列表 </label>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            @*<a href="#" class="btn btn-danger buttons-copy buttons-html5" data-toggle="modal" data-target="#comment-modal" style="display:initial;" onclick='Approve()'> <span class="far fa-check-square pt-2" style="font-size:17px;"> 同意 </span></a>*@
+                                            @*<a href="#" class="btn btn-default buttons-copy buttons-html5" data-toggle="modal" data-target="#comment-modal" style="display:initial;" onclick='Disapprove()'> <span class="far fa-times-circle pt-2" style="font-size:17px;"> 否決 </span></a>*@
+                                            @*<p class="text-muted m-b-30 font-14" style="display:none;">*@
+                                            @*DataTables has most features enabled by default, so all you need to do to use it with your own tables is to call the construction function: <code>$().DataTable();</code>.*@
+                                        </div>
+                                        <div class="col-xs-12 col-sm-6 col-md-6 ">
+                                            <div class="dt-buttons btn-group d-flex justify-content-end">
+                                                <div class="p-2">
+                                                    <a href="#" class="btn btn-danger buttons-copy buttons-html5" @*data-toggle="modal" data-target="#comment-modal"*@ style="display:initial;" onclick='Approve()'> <span class="far fa-check-square pt-2" style="font-size:17px;"> 同意 </span></a>
+                                                </div>
+                                                <div class="p-2">
+                                                    <a href="#" class="btn btn-default buttons-copy buttons-html5" @*data-toggle="modal" data-target="#comment-modal"*@ style="display:initial;" onclick='Disapprove()'> <span class="far fa-times-circle pt-2" style="font-size:17px;"> 否決 </span></a>
+                                                </div>
+                                                <div class="p-2">
+                                                </div>
+                                                <div class="p-2">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="">
+                                        <div class="">
+                                            <div class="row m-3  mt-5  mb-1" style="display:initial;">
+                                                <div class="col-md-12">
+                                                    <div class="panel panel-default">
+                                                        <div class="panel-body" style="">
+                                                            <table id="approvalList" class="table  table-hover table-responsive dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                                                                <thead style="background-color:#d7d7d4; font-size:medium;">
+                                                                    @*#ffe4e3 -> #d7d7d4 *@
+                                                                    <tr style="font-size:20px;">
+                                                                        <th class="text-center" style="width:5%;"><input class="btn-primary" type="checkbox" name="allChkbox" value="" style="width :20px;height:20px" /> </th>
+                                                                        <th class="text-center" style="width:12%;">@Html.DisplayNameFor(model => model.BatchedAppVM.Period)</th>
+                                                                        <th class="text-center" style="width:26%;">@Html.DisplayNameFor(model => model.BatchedAppVM.PayrollName)</th>
+                                                                        <th class="text-center" style="width:12%;">@Html.DisplayNameFor(model => model.BatchedAppVM.TotalAmount)</th>
+                                                                        <th class="text-center" style="width:10%;">@Html.DisplayNameFor(model => model.BatchedAppVM.WaitingDays)</th>
+                                                                        <th class="text-center" style="width:12%;">@Html.DisplayNameFor(model => model.BatchedAppVM.DeptStaffName)</th>
+                                                                        <th class="text-center" style="width:12%;">@Html.DisplayNameFor(model => model.BatchedAppVM.ApplicationDate)</th>
+
+                                                                        <th class="text-center" style="width:12%; color:#ffe4e3;"></th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    @if (Model.BatchedAppLstVM.Count > 0)
+                                                                    {
+                                                                        foreach (var item in Model.BatchedAppLstVM)
+                                                                        {
+                                                                            <tr style="">
+                                                                                <td class="text-center">
+                                                                                    @if (item.SignOff == "W")
+                                                                                    {
+                                                                                        <input class="btn-primary" type="checkbox" name="appChkbox" id="appChk" value="@(item.FormId)" style="width:20px;height:20px;" />
+                                                                                    }
+                                                                                    else
+                                                                                    {
+                                                                                        <input class="btn-primary" type="checkbox" name="appChkbox" id="appChk" value="@(item.FormId)" style="width:20px;height:20px" disabled checked />
+                                                                                    }
+                                                                                </td>
+                                                                                <td class="text-center" style="font:bolder; font-size:20px; padding-top:25px; margin-right:30%;">
+                                                                                    @Html.DisplayFor(modelItem => item.Period)
+                                                                                    @*<label style="font-size:18px;">@item.Period</label>*@
+                                                                                </td>
+                                                                                <td class="text-center" style="font:bolder; font-size:18px; padding-top:25px; ">
+                                                                                    <span class="badge badge-secondary" style="font-size:20px;"> @*@Html.DisplayFor(modelItem => item.PayrollCode)*@ @Html.DisplayFor(modelItem => item.PayrollName) </span>
+                                                                                </td>
+                                                                                <td class="text-center" style="font:bolder; font-size:20px; padding-top:25px; margin-right:50%;">
+                                                                                    <span class="badge badge-pill badge-alert" style="font-size:large; width:auto;">
+                                                                                        @item.TotalAmount.ToString("N0")
+                                                                                    </span>
+                                                                                </td>
+                                                                                <td class="text-center" style="font:bolder; font-size:20px; padding-top:25px; margin-right:50%;">
+                                                                                    <label style="font-size:18px; color:red;"> @item.WaitingDays</label>
+                                                                                </td>
+                                                                                <td class="text-center" style="font:bolder; font-size:20px; padding-top:25px; margin-right:1%;">
+                                                                                    @Html.DisplayFor(modelItem => item.DeptStaffName) ( @Html.DisplayFor(modelItem => item.DeptStaffNo) )
+                                                                                </td>
+                                                                                <td class="text-center" style="font:bolder; font-size:20px; padding-top:25px; margin-right:1%;">
+                                                                                    @Html.DisplayFor(modelItem => item.ApplicationDate)
+                                                                                </td>
+
+                                                                                <td class="text-center" style="font:bolder; font-size:20px; padding-top:25px;">
+                                                                                    <a href="#" class="btn btn-default btn-sm" data-toggle="modal" data-target="#review-form-modal" onclick="EDformDetail('@item.FormId','@item.BpmFormNo','@item.PayrollCode','@item.DeptStaffNo')"> <span class="glyphicon glyphicon-list-alt"> 表單資訊</span></a>
+                                                                                    <a href="#" class="btn btn-default btn-sm" data-toggle="modal" data-target="#signoff-record-modal" onclick="SignoffRecord('@item.BpmFormNo')"> <span class="glyphicon glyphicon glyphicon-pencil"> 簽核紀錄</span></a>
+                                                                                </td>
+                                                                            </tr>
+                                                                        }
+                                                                    }
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!--Trace Approve List -->
+                                <div class="tab-pane p-3" id="TraceApprove" role="tabpanel">
+
+                                    <div class="row mt-4 ml-4">
+                                        <div class="col-xs-12 col-sm-6 col-md-6">
+                                            <div class="dt-buttons btn-group d-flex justify-content-md-start">
+                                                <div class="p-2">
+                                                    <p class="font-14 mb-0">
+                                                        <label style="font-size:20px;"> 已簽核列表 </label>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-12 col-sm-6 col-md-6 ">
+                                            <div class="dt-buttons btn-group d-flex justify-content-end">
+                                                <div class="p-2" style="margin-bottom:5.5%;"> </div>
+                                                <div class="p-2">
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="">
+                                        <div class="">
+                                            <div class="row m-3  mt-5  mb-1" style="display:initial; ">
+                                                <div class="col-md-12">
+                                                    <div class="panel panel-default">
+                                                        <div class="panel-body" style="">
+                                                            <table id="tracedApprovalList" class="table  table-hover table-responsive dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                                                                <thead style="background-color:#d7d7d4; font-size:medium;">
+                                                                    @*#ffe4e3 -> #d7d7d4 *@
+                                                                    <tr style="font-size:20px;">
+                                                                        <th class="text-center" style="width:15%;">@Html.DisplayNameFor(model => model.TracedAppVM.Period)</th>
+                                                                        <th class="text-center" style="width:30%;">@Html.DisplayNameFor(model => model.TracedAppVM.PayrollName)</th>
+                                                                        <th class="text-center" style="width:15%;">@Html.DisplayNameFor(model => model.TracedAppVM.TotalAmount)</th>
+                                                                        <th class="text-center" style="width:15%;">@Html.DisplayNameFor(model => model.TracedAppVM.DeptStaffName)</th>
+                                                                        <th class="text-center" style="width:15%;">@Html.DisplayNameFor(model => model.TracedAppVM.ApprovedDate)</th>
+
+                                                                        <th class="text-center" style="width:15%; color:#ffe4e3;"></th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    @if (Model.TracedAppLstVM.Count > 0)
+                                                                    {
+                                                                        foreach (var item in Model.TracedAppLstVM)
+                                                                        {
+                                                                            <tr style="">
+                                                                                <td class="text-center" style="font:bolder; font-size:20px; padding-top:25px; margin-right:30%;">
+                                                                                    @Html.DisplayFor(modelItem => item.Period)
+                                                                                    @*<label style="font-size:18px;">@item.Period</label>*@
+                                                                                </td>
+                                                                                <td class="text-center" style="font:bolder; font-size:22px; padding-top:25px; ">
+                                                                                    <span class="badge badge-secondary" style="font-size:18px;"> @*@Html.DisplayFor(modelItem => item.PayrollCode)*@ @Html.DisplayFor(modelItem => item.PayrollName) </span>
+                                                                                </td>
+                                                                                <td class="text-center" style="font:bolder; font-size:22px; padding-top:25px; margin-right:50%;">
+                                                                                    <span class="badge badge-pill badge-alert" style="font-size:large; width:auto;">
+                                                                                        @item.TotalAmount.ToString("N0")
+                                                                                    </span>
+                                                                                </td>
+                                                                                <td class="text-center" style="font:bolder; font-size:20px; padding-top:25px; margin-right:1%;">
+                                                                                    @Html.DisplayFor(modelItem => item.DeptStaffName) ( @Html.DisplayFor(modelItem => item.DeptStaffNo) )
+                                                                                </td>
+                                                                                <td class="text-center" style="font:bolder; font-size:20px; padding-top:25px; margin-right:1%;">
+                                                                                    @Html.DisplayFor(modelItem => item.ApprovedDate)
+                                                                                </td>
+
+                                                                                <td class="text-center" style="font:bolder; font-size:20px; padding-top:25px;">
+                                                                                    <a href="#" class="btn btn-default btn-sm" data-toggle="modal" data-target="#review-form-modal" onclick="EDformDetail('@item.FormId','@item.BpmFormNo','@item.PayrollCode','@item.DeptStaffNo')"> <span class="glyphicon glyphicon-list-alt"> 表單資訊</span></a>
+                                                                                    <a href="#" class="btn btn-default btn-sm" data-toggle="modal" data-target="#signoff-record-modal" onclick="SignoffRecord('@item.BpmFormNo')"> <span class="glyphicon glyphicon glyphicon-pencil"> 簽核紀錄</span></a>
+                                                                                </td>
+                                                                            </tr>
+                                                                        }
+                                                                    }
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!--Memo -->
+                                <div class="tab-pane p-3" id="Memo" role="tabpanel">
+
+                                    <div class="row mt-4 ml-4">
+                                        <div class="col-xs-12 col-sm-6 col-md-6">
+                                            <div class="dt-buttons btn-group d-flex justify-content-md-start">
+                                                <div class="p-2">
+                                                    <p class="font-14 mb-0">
+                                                        <label style="font-size:20px;"> 其他相關資訊 </label>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-12 col-sm-6 col-md-6 ">
+                                            <div class="dt-buttons btn-group d-flex justify-content-end">
+                                                <div class="p-2"> </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div style="height:90px;"></div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- end row -->
+
+            <div class="row" style="display:none;">
+                <div class="col-md-12">
+                    <div class="card m-b-30">
+                        <div class="card-body">
+
+                            <div class="row mt-4 ml-4">
+                                <div class="col-xs-12 col-sm-6 col-md-6">
+                                    <div class="dt-buttons btn-group"></div>
+                                    <a href="#" class="btn btn-danger buttons-copy buttons-html5" data-toggle="modal" data-target="#comment-modal" style="display:initial;" onclick='Approve()'> <span class="far fa-check-square pt-2" style="font-size:17px;"> 同意 </span></a>
+                                    <a href="#" class="btn btn-default buttons-copy buttons-html5" data-toggle="modal" data-target="#comment-modal" style="display:initial;" onclick='Disapprove()'> <span class="far fa-times-circle pt-2" style="font-size:17px;"> 否決 </span></a>
+
+                                    <p class="text-muted m-b-30 font-14" style="display:none;">@*DataTables has most features enabled by default, so all you need to do to use it with your own tables is to call the construction function: <code>$().DataTable();</code>.*@</p>
+
+                                </div>
+
+                                <div class="col-xs-12 col-sm-6 col-md-6 ">
+                                    <div class="dt-buttons btn-group d-flex justify-content-end">
+                                        <div class="p-2">
+                                        </div>
+                                        <div class="p-2">
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="">
+                                <div class="">
+                                    <div class="row m-3  mt-5  mb-1" style="display:initial;">
+                                        <div class="col-md-12">
+                                            <div class="panel panel-default">
+                                                <div class="panel-body" style="">
+                                                    <table id="approvalList" class="table  table-hover table-responsive dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                                                        <thead style="background-color:#d7d7d4; font-size:medium;">
+                                                            @*#ffe4e3 -> #d7d7d4 *@
+                                                            <tr style="font-size:medium;">
+                                                                <th class="text-center" style="width:7%;"><input class="btn-primary" type="checkbox" name="allChkbox" value="" style="width :20px;height:20px" /> </th>
+                                                                <th class="text-center" style="width:9%;">@Html.DisplayNameFor(model => model.BatchedAppVM.Period)</th>
+                                                                <th class="text-center" style="width:30%;">@Html.DisplayNameFor(model => model.BatchedAppVM.PayrollName)</th>
+                                                                <th class="text-center" style="width:12%;">@Html.DisplayNameFor(model => model.BatchedAppVM.TotalAmount)</th>
+                                                                <th class="text-center" style="width:10%;">@Html.DisplayNameFor(model => model.BatchedAppVM.WaitingDays)</th>
+                                                                <th class="text-center" style="width:10%;">@Html.DisplayNameFor(model => model.BatchedAppVM.DeptStaffName)</th>
+                                                                <th class="text-center" style="width:10%;">@Html.DisplayNameFor(model => model.BatchedAppVM.ApplicationDate)</th>
+
+                                                                <th class="text-center" style="width:15%; color:#ffe4e3;"></th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @if (Model.BatchedAppLstVM.Count > 0)
+                                                            {
+                                                                foreach (var item in Model.BatchedAppLstVM)
+                                                                {
+                                                                    <tr>
+                                                                        <td class="text-center">
+                                                                            @if (item.SignOff == "W")
+                                                                            {
+                                                                                <input class="btn-primary" type="checkbox" name="appChkbox_none" id="appChk" value="@(item.FormId)" style="width:20px;height:20px;" />
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <input class="btn-primary" type="checkbox" name="appChkbox_none" id="appChk" value="@(item.FormId)" style="width:20px;height:20px" disabled checked />
+                                                                            }
+                                                                        </td>
+                                                                        <td class="text-center" style="font:bolder; font-size:larger; padding-top:25px; margin-right:30%;">
+                                                                            @Html.DisplayFor(modelItem => item.Period)
+                                                                            @*<label style="font-size:18px;">@item.Period</label>*@
+                                                                        </td>
+                                                                        <td class="text-center" style="font:bolder; font-size:18px; padding-top:25px; ">
+                                                                            <span class="badge badge-secondary" style="font-size:18px;"> @*@Html.DisplayFor(modelItem => item.PayrollCode)*@ @Html.DisplayFor(modelItem => item.PayrollName) </span>
+                                                                        </td>
+                                                                        <td class="text-center" style="font:bolder; font-size:18px; padding-top:25px; margin-right:50%;">
+                                                                            <span class="badge badge-pill badge-alert" style="font-size:large; width:auto;">
+                                                                                @item.TotalAmount.ToString("N0")
+                                                                            </span>
+                                                                        </td>
+                                                                        <td class="text-center" style="font:bolder; font-size:20px; padding-top:25px; margin-right:50%;">
+                                                                            <label style="font-size:18px; color:red;"> @item.WaitingDays</label>
+                                                                        </td>
+                                                                        <td class="text-center" style="font:bolder; font-size:larger; padding-top:25px; margin-right:1%;">
+                                                                            @Html.DisplayFor(modelItem => item.DeptStaffName) ( @Html.DisplayFor(modelItem => item.DeptStaffNo) )
+                                                                        </td>
+                                                                        <td class="text-center" style="font:bolder; font-size:larger; padding-top:25px; margin-right:1%;">
+                                                                            @Html.DisplayFor(modelItem => item.ApplicationDate)
+                                                                        </td>
+
+                                                                        <td class="text-center" style="font:bolder; font-size:larger; padding-top:25px;">
+                                                                            <a href="#" class="btn btn-default btn-sm" data-toggle="modal" data-target="#review-form-modal" onclick="EDformDetail('@item.FormId','@item.BpmFormNo','@item.PayrollCode','@item.DeptStaffNo')"> <span class="glyphicon glyphicon-list-alt"> 表單資訊</span></a>
+                                                                            <a href="#" class="btn btn-default btn-sm" data-toggle="modal" data-target="#signoff-record-modal" onclick="SignoffRecord('@item.BpmFormNo')"> <span class="glyphicon glyphicon glyphicon-pencil"> 簽核紀錄</span></a>
+                                                                        </td>
+                                                                    </tr>
+                                                                }
+                                                            }
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- end row -->
+
+
+
+
+
+        </div>
+
+
+        <div class="modal fade" id="review-form-modal" tabindex="-1" role="dialog" aria-labelledby="Modal-simple-demo-label" aria-hidden="true" style="width:100%;">
+            <div class="modal-dialog modal-dialog-md modal-dialog-centered " role="alert" style="width:85%;">
+                <div class="modal-content">
+                    <div class="modal-header d-inline" style="background-color:#444442 ;">
+                        @*  #ff828c --> #444442 *@
+                        <h4 class="modal-title" id="Modal-simple-demo-label" style="color:ghostwhite; border:none; width:100%;">
+                            <i class="far fa-window-maximize"></i><spna style="color:#444442;">.</spna> 檢閱表單
+                        </h4>
+                        @*<button type="button" style="color:white; border:dotted;" class="close" data-dismiss="modal" aria-label="Close">
+                            <span class="fa fa-times"></span>
+                        </button>*@
+                    </div>
+                    <div class="modal-body">
+                        <div class="panel panel-info ">
+                            <div class="panel-body" style="border-width:1px; border-color:#f2eded;">
+                                @{Html.RenderPartial("PartialView/_ReviewFormPartialView"); }
+                            </div>
+                        </div>
+
+                        <div class="d-flex flex-row-reverse">
+                            <button type="button" class="btn btn-primary flex-row-reverse" data-dismiss="modal">關閉</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="signoff-record-modal" tabindex="-1" role="dialog" aria-labelledby="Modal-simple-demo-label" aria-hidden="true" style="width:100%;">
+            <div class="modal-dialog modal-dialog-md modal-dialog-centered " role="alert" style="width:65%;">
+                <div class="modal-content">
+                    <div class="modal-header d-inline" style="background-color:#444442 ;">
+                        @*  #ff828c --> #444442 *@
+                        <h4 class="modal-title" id="Modal-simple-demo-label" style="color:ghostwhite; border:none; width:100%;">
+                            <i class="far fa-window-maximize"></i><spna style="color:#444442;">.</spna> 簽核歷程
+                        </h4>
+                        @*<button type="button" style="color:white; border:dotted;" class="close" data-dismiss="modal" aria-label="Close">
+                            <span class="fa fa-times"></span>
+                        </button>*@
+                    </div>
+                    <div class="modal-body">
+                        <div class="panel panel-info ">
+                            <div class="panel-body" style="border-width:1px; border-color:#f2eded;">
+                                @{Html.RenderPartial("PartialView/_SignOffRecordPartialView"); }
+                            </div>
+                        </div>
+
+                        <div class="d-flex flex-row-reverse">
+                            <button type="button" class="btn btn-primary flex-row-reverse" data-dismiss="modal">關閉</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="comment-modal" tabindex="-1" role="dialog" aria-labelledby="Modal-simple-demo-label" aria-hidden="false" style="width:100%;">
+            <div class="modal-dialog modal-dialog-md modal-dialog-centered " role="dialog" style="width:40%;">
+                <div class="modal-content">
+                    <div class="modal-header d-inline" style="background-color:#444442 ;">
+                        @*  #ff828c --> #444442 *@
+                        <h4 class="modal-title" id="Modal-simple-demo-label" style="color:ghostwhite; border:none; width:100%;">
+                            <i class="far fa-window-maximize"></i><spna style="color:#444442;">.</spna> 簽核意見
+                        </h4>
+                        @*<button type="button" style="color:white; border:dotted;" class="close" data-dismiss="modal" aria-label="Close">
+                            <span class="fa fa-times"></span>
+                        </button>*@
+                    </div>
+                    <div class="modal-body">
+                        <div class="panel panel-info ">
+                            <div class="panel-body" style="border-width:1px; border-color:#f2eded;">
+                                @{Html.RenderPartial("PartialView/_CommentPartialView"); }
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-center">
+                            <div class="p-2 flex-fill"></div>
+                            <div class="p-2 flex-fill">
+                                <button type="button" class="btn btn-primary btn-block" data-dismiss="modal" id="vSubmit" onclick="signoff_submit()">送出</button>
+                            </div>
+                            <div class="p-2 flex-fill">
+                                <button type="button" class="btn btn-primary btn-block" data-dismiss="modal">關閉</button>
+                            </div>
+                            <div class="p-2 flex-fill"></div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="warninig-modal" tabindex="-1" role="dialog" aria-labelledby="Modal-simple-demo-label" aria-hidden="false" style="width:100%;">
+            <div class="modal-dialog modal-dialog-md modal-dialog-centered " role="dialog" style="width:40%;">
+                <div class="modal-content">
+                    <div class="modal-header d-inline" style="background-color:#444442 ;">            
+                        <h4 class="modal-title" id="Modal-simple-demo-label" style="color:ghostwhite; border:none; width:100%;">
+                            <i class="far fa-window-maximize"></i><spna style="color:#444442;">.</spna> 提示訊息
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="panel panel-info ">
+                            <div class="panel-body" style="border-width:1px; border-color:#f2eded;">
+                                <div class="container" style="width:100%; ">                         
+                                    <div class="card m-b-30">
+                                        <div class="card-body bg-light">
+                                            <div class="row " style="height:auto; border:none; border-radius:10px;">
+                                                <div class="col-md-2"></div>
+                                                <div class="col-md-8 col-sm-12 col-xs-12"><h3 class="text-center"> 請先選擇表單 !! </h3> </div>
+                                                <div class="col-md-2"></div>
+                                            </div>                                         
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-center">
+                            <div class="p-2 flex-fill"></div>
+                            <div class="p-2 flex-fill"><button type="button" class="btn btn-primary btn-block" data-dismiss="modal">關閉</button> </div>
+                            <div class="p-2 flex-fill"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+@section scripts{
+
+    <script>
+
+
+
+        $().ready(function () {
+
+            $('#nav-item-1').attr('class', 'nav-item waves-effect waves-light active');            
+            //$('ul li:nth-child(1)')
+
+            $('a[data-toggle="tab"]').on('show.bs.tab', function (e) {
+                localStorage.setItem('activeTab', $(e.target).attr('href'));
+            });
+            var activeTab = localStorage.getItem('activeTab');
+            if (activeTab) {
+                $('#approveTab a[href="' + activeTab + '"]').tab('show');
+            }
+
+            //------IE會導致無法跳出同意
+            //let url = location.href.replace(/\/$/, "");
+
+            //if (location.hash) {
+            //    const hash = url.split("#");
+            //    $('#approveTab a[href="#' + hash[1] + '"]').tab("show");
+            //    url = location.href.replace(/\/#/, "#");
+            //    history.replaceState(null, null, url);
+            //    setTimeout(() => {
+            //        $(window).scrollTop(0);
+            //    }, 400);
+            //}
+
+            //$('a[data-toggle="tab"]').on("click", function () {
+            //    let newUrl;
+            //    const hash = $(this).attr("href");
+            //    if (hash == "#SummaryStatement") {
+            //        newUrl = url.split("#")[0];
+            //    } else {
+            //        newUrl = url.split("#")[0] + hash;
+            //    }
+            //    newUrl += "/";
+            //    history.replaceState(null, null, newUrl);
+            //});
+            //-----------
+        });               
+
+        var appLstTable = $('#approvalList').DataTable({
+            columnDefs: [
+                { targets: 0, sortable: false },
+            ],
+            "order": [[1, "asc"]],
+            "lengthMenu": [10, 25, 50, 100],
+            "responsive": true,
+            "oLanguage": {
+                "sEmptyTable": '<span class="glyphicon glyphicon-list-alt" style="font: bolder; font-size:25px;"><label class="pl-3">無待簽核表單</label></span>'
+            }
+        });
+
+        var tracedappTable = $('#tracedApprovalList').DataTable({
+            columnDefs: [
+                { targets: 0, sortable: false },
+            ],
+            "order": [[1, "asc"]],
+            "lengthMenu": [10, 25, 50, 100],
+            "responsive": true,
+            "oLanguage": {
+                "sEmptyTable": '<span class="glyphicon glyphicon-list-alt" style="font: bolder; font-size:25px;"><label class="pl-3">無已簽核表單</label></span>'
+            }
+        });
+
+
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            var target = $(e.target).attr("href") // activated tab
+            //alert(target);
+
+            switch (target) {
+                case '#ApprovalList':                  
+                    $(window).trigger('resize');
+                    break;
+                case '#TraceApprove':            
+                    $(window).trigger('resize');
+                    break;
+                default:
+                    break;
+
+
+            }
+
+        });
+
+
+        $('input:checkbox[name=allChkbox]').on('click', function () {
+
+            var count = $('input:checkbox[name=allChkbox]:checked').length;
+
+            if (count > 0) {
+                $.each($('input[name="appChkbox"]'), function () { $(this).prop("checked", true); });
+            }
+            else {
+                $.each($('input[name="appChkbox"]'), function () { $(this).prop("checked", false); });
+            }
+        });
+
+
+        $('#approvalList').on('page.dt', function () {
+
+            $('input:checkbox[name=allChkbox]').prop("checked", false);
+
+            $.each($('input[name="appChkbox"]'), function () {
+
+                $(this).prop("checked", false);
+
+            });
+
+            // alert("Page:" + appLstTable.page.info());
+        });
+
+
+
+        function EDformDetail(formId,bpmFormNo,pCode,deptStaffNo) {
+
+            $('.loader-wrapper').fadeIn('5000', function () { });
+            var formReviewUrl = encodeURI('@Url.Action("GetFormReview", "Approve")' + '?formId=' + formId + '&bpmFormNo=' + bpmFormNo + '&pCode=' + pCode + '&deptStaffNo=' + deptStaffNo);
+
+            $.ajax({
+                type: "Get",
+                url: formReviewUrl,               
+                success: function (data) {
+
+                    if (data.length != 0 && data != 'null') {
+
+                        var fileLstStr = "";
+                        var obj = JSON.parse(data);
+
+                        $("#vProjNo").val(obj.ED_HeaderVM.ProjectNo);
+                        $("#vProjName").val(obj.ED_HeaderVM.ProjectName);
+                        $("#vProjNamelabel").text(obj.ED_HeaderVM.ProjectName);
+                        $("#vAppEmpNo").val(obj.ED_HeaderVM.AppEmpNo);
+                        $("#vAppEmpName").val(obj.ED_HeaderVM.AppEmpName);
+                        $("#vDeptCode").val(obj.ED_HeaderVM.DeptCode);
+                        $("#vDeptName").val(obj.ED_HeaderVM.DeptName);
+                        $("#vPayrollCode").val(obj.ED_HeaderVM.PayrollCode);
+                        $("#vPayrollName").val(obj.ED_HeaderVM.PayrollName);
+
+
+                        for (var i = 0; i < obj.Files.length; i++) {
+
+                            var formReviewUrl = encodeURI('@Url.HttpRouteUrl("DataApiController", new { controller = "data", action = "file"})' + '?fileName=' + obj.Files[i].Name + '&fileContent=apply-uploads' );
+                            fileLstStr += '<a href="' + formReviewUrl+'" class="btn btn-outline-secondary ml-5" style="font-size:larger;" id="instructions"> ' + obj.Files[i].Name + '</a>';
+                        }
+                        $('#vFileLst').empty();
+                        $("#vFileLst").append(fileLstStr);
+
+
+                        $("#total_amt").text(obj.ED_HeaderVM.TotalAmount.toLocaleString('zh-tw', {
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 0,
+                            style: 'currency',
+                            currency: 'TWD',
+                        }));
+
+                        if (obj.ED_ItemLstVM.length >= 0) {
+
+                            $('#apply-item-table').attr("css", "width: 100%; ")
+
+                            if ($.fn.dataTable.isDataTable('#apply-item-table')) {
+                                table = $('#apply-item-table').DataTable();
+                                table.destroy();
+                            }
+
+                            $('#apply-item-table').dataTable({
+                                data: obj.ED_ItemLstVM,
+                                columns: [
+                                    //{ data: "SN" },
+                                    //{ data: "PayrollCode" },
+                                    //{ data: "PayrollName" },
+                                    { data: "EmpNo" },
+                                    { data: "EmpName" },
+                                    //{ data: "DeptCode" },
+                                    { data: "DeptName" },
+                                    { data: "EmpType" },
+                                    { data: "WorkStatus" },
+                                    { data: "QuitDate" },
+                                    { data: "CostCentre" },
+                                    { data: "Amount" }
+
+                                    //{ data: "" }
+                                ],
+                                "pages": 5,
+                                "responsive": true,
+                                "bLengthChange": false,
+                                "order": [[1, "asc"]],
+                                "lengthMenu": [5]
+                            });
+
+                            $('#vAppReviewloader').attr("style", "display:none");
+                            $('#vAppSubitemList').attr("style", "display:initial");
+                            $(window).trigger('resize');
+                            
+                            $('.loader-wrapper').fadeOut('slow', function () { });
+
+                        }
+                    }
+                }
+            });
+            
+          
+        }
+
+        function SignoffRecord(bpmFormNo) {
+
+            //$('.loader-wrapper').fadeIn('1000', function () { });
+            var signoffRecordUrl = encodeURI('@Url.Action("GetSignOffRecord", "Approve")' + '?bpmFormNo=' + bpmFormNo );
+
+            $.ajax({
+                type: "Get",
+                url: signoffRecordUrl,
+                success: function (data) {
+
+                    if (data.length != 0 && data != 'null') {
+
+                        var obj = JSON.parse(data);
+
+                        if (obj.length >= 0) {
+
+                            $('#signoff_record_tbody').empty();
+                            var findWaitingSigner = false;
+
+                            for (var i = 0; i < obj.length; i++) {
+                                //alert(obj.StaffPermList[i].EmpNo + " " + obj.StaffPermList[i].EmpName + " " + obj.StaffPermList[i].DeptCode + " " + obj.StaffPermList[i].DeptName + " " + obj.StaffPermList[i].PayrollCode + " " + obj.StaffPermList[i].PayrollName + " " + obj.StaffPermList[i].Status);
+                                var appYN = (obj[i].AppYN != "" && obj[i].AppYN != null) ? obj[i].AppYN == "Y" ? '同意' : '否決' : obj[i].AppRole == "重新送簽" ? obj[i].AppRole : "";
+                                var appRemark = obj[i].AppRemark != null ? obj[i].AppRemark : '';
+                                var getCurSigner = obj[i].AppDate == null ? true : false;
+                                var signed = obj[i].AppYN == null ? false : true;
+                                var signedDate = obj[i].AppDate != null ? obj[i].AppDate.split("T")[0] + " " + obj[i].AppDate.split("T")[1].split(".")[0] : "";
+                                var index = i + 1;
+
+
+                                htmlStr = '<tr>' +
+                                    '<td class="text-center" style="vertical-align:middle;">' +
+                                    '  <label style="font-size:18px;">' + index + '</label>' +
+                                    '</td>' +
+                                    '<td class="text-center" style="vertical-align:middle;">' +
+                                    '  <label style="font-size:18px;">' + obj[i].AppEmpName + '<br /><code>' + obj[i].AppRole+'</code></label>' +
+                                    '</td>' +
+                                    '<td class="text-center" style="vertical-align:middle;> ' +
+                                    '  <label style="font-size:18px;">' + appYN + '</label> ' + '<br /><label style="font-size:15px;">' + signedDate + '</label> ' +
+                                    '</td>' +
+                                    '<td class="text-center" style="vertical-align:middle;> ' +
+                                    '   <label style="font-size:18px;"> ' + appRemark + '</label> ' +
+                                    '</td>';
+
+                                if (!getCurSigner && appYN != "") {
+                                    htmlStr += '<td class="text-center" style="vertical-align:middle;">' +
+                                        '<span class="glyphicon glyphicon-ok" style="font-size:25px;"></span>' +
+                                        '</td>'
+                                        ;
+                                }
+                                else if (getCurSigner && appYN == "" && !findWaitingSigner) {
+
+                                    findWaitingSigner = true;
+                                    htmlStr += '<td class="text-center" style="vertical-align:middle;">' +
+                                        '<span class="glyphicon glyphicon-time" style="font-size:25px;"></span>' +
+                                        '</td>'
+                                        ;
+
+                                }
+                                else {
+                                    htmlStr += '<td class="text-center" style="vertical-align:middle;">' +
+                                        '<span class="" style="font-size:25px;"></span>' +
+                                        '</td>'
+                                        ;
+                                }
+
+
+                                htmlStr += '</tr>';
+
+                                $("#signoff_record_tbody").append(htmlStr);
+                            }
+
+                        }
+                        else {
+
+                            htmlStr = '<tr style="font-size:20px; background-color:#F8F8F8;">' +
+                                '<td class="text-center" colspan="5"><label> 系統異常，請稍後再試</label></td>' +
+                                '</tr>';
+                            $('#signoff_record_tbody').empty();
+                            $("#signoff_record_tbody").append(htmlStr);
+
+                        }
+                    }
+                    //$('.loader-wrapper').fadeOut('slow', function () { });
+
+                    $('#vSignofLoader').attr("style", "display:none");
+                    $('#vSignoffReview').attr("style", "display:initial");
+
+
+                }
+            });
+        }
+
+        function Approve() {
+
+            var index = 1;
+            //var value_check = "";
+            $('#vRemark').empty();
+            var count = $("input:checkbox[name=appChkbox]:checked").length;
+            var jsonStr = '[';
+
+            $.each($("input[name='appChkbox']:checked"), function () {
+
+                jsonStr += '{ "FormId": "' + $(this).val() + '" }';
+
+                if (index <= count - 1) {
+                    jsonStr +=',';
+                }
+                index++;
+                //value_check += index++ + ": " + $(this).val()+"\n";
+            });
+
+
+            jsonStr += ']';
+
+            $('#vYN').val("Y");
+            $('#vFormIdJson').val(jsonStr);
+            $('#vCommentTitle').text(" (同意) 簽核意見 ");
+            //alert(value_check);
+
+            if (jsonStr != '[]') {
+                $('#comment-modal').modal('show');
+            }
+            else {
+                $('#warninig-modal').modal('show')
+            }
+
+
+        }
+
+        function Disapprove() {
+
+            var index = 1;
+            //var value_check = "";
+            $('#vRemark').empty();
+            var count = $("input:checkbox[name=appChkbox]:checked").length;
+            var jsonStr = '[';
+
+            $.each($("input[name='appChkbox']:checked"), function () {
+
+                jsonStr += '{ "FormId": "' + $(this).val() + '" }';
+
+                if (index <= count - 1) {
+                    jsonStr += ',';
+                }
+                index++;
+                //value_check += index++ + ": " + $(this).val() + "\n";
+            });
+
+            jsonStr += ']';
+
+            $('#vYN').val("N");
+            $('#vFormIdJson').val(jsonStr);
+            $('#vCommentTitle').text("(否決)簽核意見");
+            //alert(value_check);
+
+            if (jsonStr != '[]') {
+                $('#comment-modal').modal('show');
+            }
+            else {
+                $('#warninig-modal').modal('show')
+            }
+
+        }
+
+        function signoff_submit() {
+
+            $('.loader-wrapper').fadeIn('5000', function () { });
+
+            var remark = $('#vRemark').val() != "" ? $('#vRemark').val().trim() : "無簽核意見";
+
+
+            var submitUrl = $('#vYN').val() == "Y"
+                ? encodeURI('@Url.Action("BatchApprovalList", "Approve")' + '?jsonStr=' + $('#vFormIdJson').val() + '&remark=' + remark)
+                : encodeURI('@Url.Action("BatchDisapprovalList", "Approve")' + '?jsonStr=' + $('#vFormIdJson').val() + '&remark=' + remark);
+            $.ajax({
+                type: "Get",
+                url: submitUrl,
+                success: function (data) {
+
+                    if (data.length != 0 && data != 'null') {
+
+                        var obj = JSON.parse(data);
+
+                        if (obj.length >= 0) {
+
+                            ; // To do
+                            $('#TEST').text()
+
+                        }
+
+                    }
+                    //$('.loader-wrapper').fadeOut('slow', function () { });
+                    location.reload();
+                }
+            });
+        }
+
+    </script>
+
+}
+

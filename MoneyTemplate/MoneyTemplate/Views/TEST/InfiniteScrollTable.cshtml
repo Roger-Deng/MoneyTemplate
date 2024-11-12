@@ -1,0 +1,152 @@
+
+<style>
+
+    /*============== Infinite Scroll Table =================*/
+        infinite-table {
+            height: 220px;
+            overflow: auto;
+        }
+
+            infinite-table.tableFixHead {
+                overflow: auto;
+                height: 100px;
+            }
+
+                infinite-table.tableFixHead thead th {
+                    position: sticky;
+                    top: 0;
+                    z-index: 1;
+                }
+    /*============== Infinite Scroll Table =================*/
+
+</style>
+
+
+<div class="boxbody">
+                <div class="tablebox tableFixHead" id="infinite-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>中文姓名</th>
+                                <th>英文姓名</th>
+                                <th>職等級</th>
+                                <th>職務</th>
+                                <th>部門名稱</th>
+                            </tr>
+                        </thead>
+                        <tbody id="scroll_tbody">
+                            <tr>
+                                <td>#</td>
+                                <td>楊**</td>
+                                <td>Michelle Yang</td>
+                                <td>D6-3</td>
+                                <td>資深助理工程師</td>
+                                <td>XX部(1)日X班</td>
+                            </tr>
+                            <tr>
+                                <td>#</td>
+                                <td>林**</td>
+                                <td>Annie Yang</td>
+                                <td>E6-3</td>
+                                <td>資深工程師</td>
+                                <td>XX部(1)夜X班</td>
+                            </tr>
+                            <tr>
+                                <td>#</td>
+                                <td>陳**</td>
+                                <td>Eve Yang</td>
+                                <td>D5-3</td>
+                                <td>工程師</td>
+                                <td>XX部(2)日X班</td>
+                            </tr>
+                            <tr>
+                                <td>#</td>
+                                <td>王**</td>
+                                <td>Zora Yang</td>
+                                <td>E4-5</td>
+                                <td>高級工程師</td>
+                                <td>XX部(3)日X班</td>
+                            </tr>
+                            <tr>
+                                <td>#</td>
+                                <td>楊**</td>
+                                <td>Michelle Yang</td>
+                                <td>D6-3</td>
+                                <td>資深助理工程師</td>
+                                <td>XX部(1)日X班</td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+
+                </div>
+
+            </div>
+
+
+<script type="text/javascript">
+            
+//=========================Infinite Scroll Table====================
+
+  let dataModel = new Array(); //Html.Raw(Json.Encode(Model)); //Html.Raw(Json.Encode(Model));
+  let dataIndex = 0;
+
+    //Infinite Scroll Table
+
+const div = document.querySelector("#infinite-table");
+
+        const table = //document.getElementById("#scroll_tbody");
+                     document.querySelector("#infinite-table").getElementsByTagName("tbody")[0];
+
+
+
+        const loadMore = () => {
+
+           let preDataIndex = dataIndex;
+           dataIndex = dataModel.length - dataIndex > 20 ? dataIndex + 20 : dataModel.length ;
+
+           for (let item = preDataIndex; item < dataIndex ; item++) {
+
+               let row = table.insertRow(-1);
+               row.insertCell(0).innerHTML = item+1;
+               row.insertCell(1).innerHTML = dataModel[item].EMP_NAME;
+               row.insertCell(2).innerHTML = dataModel[item].NAME_EN;
+               row.insertCell(3).innerHTML = dataModel[item].SLY_DEGREE;
+               row.insertCell(4).innerHTML = dataModel[item].TITLE_NAME;
+               row.insertCell(5).innerHTML = dataModel[item].DEPT_NAME;
+
+           }
+           //dataModel.ForEach((item) => {
+           //    let row = table.insertRow(-1);
+           //    row.insertCell(0).innerHTML = item.EMP_NAME;
+           //    row.insertCell(1).innerHTML = item.NAME_EN;
+           //    row.insertCell(2).innerHTML = item.SLY_DEGREE;
+           //    row.insertCell(3).innerHTML = item.TITLE_NAME;
+           //    row.insertCell(4).innerHTML = item.DEPT_NAME; }
+           //)
+        };
+
+
+        div.addEventListener(
+           "scroll",
+           () => {
+               if (Math.abs(div.scrollHeight - div.clientHeight - div.scrollTop) < 1 &&
+                   dataIndex <= dataModel.length ) {
+                   loadMore();
+               }
+           },
+           {
+               passive: true
+           }
+        );
+
+        loadMore();
+//=========================Infinite Scroll Table====================
+
+
+
+            
+            </script>
